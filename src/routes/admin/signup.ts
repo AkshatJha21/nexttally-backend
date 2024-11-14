@@ -1,9 +1,8 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import { adminSignup } from "../../controllers/admin/signupController";
 
 const signupRouter = Router();
 
-signupRouter.get('/', (req: Request, res: Response) => {
-    res.send("admin signup");
-});
+signupRouter.post('/', adminSignup);
 
 export default signupRouter;

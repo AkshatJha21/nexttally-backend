@@ -1,9 +1,8 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import { adminLogin } from "../../controllers/admin/loginController";
 
 const loginRouter = Router();
 
-loginRouter.get('/', (req: Request, res: Response) => {
-    res.send("admin login");
-});
+loginRouter.post('/', adminLogin);
 
 export default loginRouter;

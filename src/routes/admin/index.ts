@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import branchRouter from "./branch";
 import loginRouter from "./login";
 import signupRouter from "./signup";
