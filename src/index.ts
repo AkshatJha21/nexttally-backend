@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import adminRouter from "./routes/admin";
-import managerRouter from "./routes/manager";
+import adminRouter from "./routes/admin/index";
+import managerRouter from "./routes/manager/index";
 
 const app = express();
 const port = 3003;
