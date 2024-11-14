@@ -7,12 +7,13 @@ import { JWT_SECRET } from "../../helpers/constants";
 
 export const adminSignup = async (req: Request, res: Response) => {
     try {
-        const parsedBody = adminSignupInput.safeParse(req.body);
+        const body = await req.body;
+        const parsedBody = adminSignupInput.safeParse(body);
 
         if (!parsedBody.success) {
             res.status(400).json({
                 error: "Invalid inputs",
-                issues: parsedBody.error.format()
+                issues: parsedBody.error
             });
             return;
         }
