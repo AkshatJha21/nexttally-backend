@@ -1,5 +1,5 @@
 import { Router } from "express";
-import branchRouter from "../admin/branch";
+import branchRouter from "../manager/branch";
 import bookingRouter from "./booking";
 import managerLoginRouter from "./login";
 import movieRouter from "./movie";
