@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { db } from "../../lib/db";
-import { adminLoginInput } from "../../helpers/zod";
+import { db } from "../../../lib/db";
+import { adminLoginInput } from "../../../helpers/zod";
 import { compare } from "bcrypt";
-import { JWT_SECRET } from "../../helpers/constants";
+import { JWT_SECRET } from "../../../helpers/constants";
 import { sign } from "jsonwebtoken";
 
 export const adminLogin = async (req: Request, res: Response) => {
     try {
-        const body = await req.body();
+        const body = await req.body;
         const parsedBody = await adminLoginInput.safeParse(body);
 
         if (!parsedBody.success) {

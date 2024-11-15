@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { db } from "../../lib/db";
-import { adminSignupInput } from "../../helpers/zod";
+import { db } from "../../../lib/db";
+import { adminSignupInput } from "../../../helpers/zod";
 import { genSalt, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { JWT_SECRET } from "../../helpers/constants";
+import { JWT_SECRET } from "../../../helpers/constants";
 
 export const adminSignup = async (req: Request, res: Response) => {
     try {

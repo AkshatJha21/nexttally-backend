@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { db } from "../../lib/db";
-import { newBranchInput } from "../../helpers/zod";
+import { db } from "../../../lib/db";
+import { newBranchInput } from "../../../helpers/zod";
 import { genSalt, hash } from "bcrypt";
 
 export const getBranches = async (req: Request, res: Response) => {
