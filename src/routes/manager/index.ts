@@ -1,9 +1,14 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
+import branchRouter from "../admin/branch";
+import bookingRouter from "./booking";
+import managerLoginRouter from "./login";
+import movieRouter from "./movie";
 
 const managerRouter = Router();
 
-managerRouter.get('/', (req: Request, res: Response) => {
-    res.send('manager working');
-});
+managerRouter.use('/branch', branchRouter);
+managerRouter.use('/booking', bookingRouter);
+managerRouter.use('/login', managerLoginRouter);
+managerRouter.use('/movie', movieRouter);
 
 export default managerRouter;
