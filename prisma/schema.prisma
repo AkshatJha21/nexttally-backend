@@ -27,8 +27,8 @@ model Branch {
   location  String
   adminId   Int
   managerId Int       @unique
-  admin     Admin     @relation(fields: [adminId], references: [id])
-  manager   Manager   @relation(fields: [managerId], references: [id])
+  admin     Admin     @relation(fields: [adminId], references: [id],  onDelete: Cascade)
+  manager   Manager   @relation(fields: [managerId], references: [id], onDelete: Cascade)
   movies    Movie[]
 }
 
@@ -44,7 +44,7 @@ model Movie {
   id          Int           @id @default(autoincrement())
   title       String
   branchId    Int
-  branch      Branch         @relation(fields: [branchId], references: [id])
+  branch      Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
   seatCategories SeatCategory[]
 }
 
@@ -54,7 +54,7 @@ model SeatCategory {
   price       Float
   totalSeats  Int
   movieId     Int
-  movie       Movie          @relation(fields: [movieId], references: [id])
+  movie       Movie          @relation(fields: [movieId], references: [id], onDelete: Cascade)
   seatBookings SeatBooking[]
 }
 
@@ -63,7 +63,7 @@ model SeatBooking {
   seatsOccupied  Int
   bookingDate    DateTime
   categoryId     Int
-  category       SeatCategory  @relation(fields: [categoryId], references: [id])
+  category       SeatCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([categoryId, bookingDate])
 }
