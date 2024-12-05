@@ -2,84 +2,98 @@ import { Request, Response } from "express";
 import { db } from "../../../lib/db";
 import { newBranchInput } from "../../../helpers/zod";
 import { genSalt, hash } from "bcrypt";
+import { verify } from "jsonwebtoken";
+import { JWT_SECRET } from "../../../helpers/constants";
 
 export const getBranches = async (req: Request, res: Response) => {
     try {
-        const adminId = parseInt(req.query.adminId as string, 10);
+        const authHeader = req.headers.authorization;
 
-        if (!adminId || isNaN(adminId)) {
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
             res.status(400).json({
-                error: "Admin ID is required and must be a valid integer"
+                error: 'Bearer token not found'
             });
             return;
         }
 
-        const admin = await db.admin.findUnique({
-            where: {
-                id: adminId
+        const obj = verify(authHeader.split(' ')[1], JWT_SECRET);
+        
+        if (obj) {
+            const admin = await db.admin.findUnique({
+                where: {
+                    id: (obj as any).id
+                }
+            });
+
+            if (!admin) {
+                res.status(400).json({ 
+                    error: "Admin not found" 
+                });
+                return;
             }
-        });
 
-        if (!admin) {
-            res.status(400).json({ 
-                error: "Admin not found" 
-            });
-            return;
-        }
+            const adminId = admin?.id;
 
-        const branches = await db.branch.findMany({
-            where: { adminId: adminId },
-            include: {
-                manager: true,
-                movies: {
-                    include: {
-                        seatCategories: {
-                            include: { seatBookings: true }
+            const branches = await db.branch.findMany({
+                where: { adminId: adminId },
+                include: {
+                    manager: true,
+                    movies: {
+                        include: {
+                            seatCategories: {
+                                include: { seatBookings: true }
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        if (!branches.length) {
-            res.status(400).json({ 
-                error: "No branches found for this admin" 
+            if (!branches.length) {
+                res.status(400).json({ 
+                    error: "No branches found for this admin" 
+                });
+                return;
+            }
+
+            const branchWithRevenue = branches.map(branch => ({
+                ...branch,
+                movies: branch.movies.map(movie => {
+                    let totalMovieRevenue = 0;
+    
+                    const seatCategoriesWithRevenue = movie.seatCategories.map(category => {
+                        const totalSeatsOccupied = category.seatBookings.reduce(
+                            (sum, booking) => sum + booking.seatsOccupied,
+                            0
+                        );
+                        const categoryRevenue = totalSeatsOccupied * category.price;
+                        totalMovieRevenue += categoryRevenue;
+    
+                        return {
+                            ...category,
+                            totalSeatsOccupied,
+                            categoryRevenue
+                        };
+                    });
+    
+                    return {
+                        ...movie,
+                        seatCategories: seatCategoriesWithRevenue,
+                        totalMovieRevenue
+                    };
+                })
+            }));
+    
+            res.status(200).json({ 
+                branches: branchWithRevenue
+            });
+            return;
+
+        } else {
+            res.status(403).json({
+                error: 'You are not authorized'
             });
             return;
         }
-
-        const branchWithRevenue = branches.map(branch => ({
-            ...branch,
-            movies: branch.movies.map(movie => {
-                let totalMovieRevenue = 0;
-
-                const seatCategoriesWithRevenue = movie.seatCategories.map(category => {
-                    const totalSeatsOccupied = category.seatBookings.reduce(
-                        (sum, booking) => sum + booking.seatsOccupied,
-                        0
-                    );
-                    const categoryRevenue = totalSeatsOccupied * category.price;
-                    totalMovieRevenue += categoryRevenue;
-
-                    return {
-                        ...category,
-                        totalSeatsOccupied,
-                        categoryRevenue
-                    };
-                });
-
-                return {
-                    ...movie,
-                    seatCategories: seatCategoriesWithRevenue,
-                    totalMovieRevenue
-                };
-            })
-        }));
-
-        res.status(200).json({ 
-            branches: branchWithRevenue 
-        });
-        return;
 
     } catch (error) {
         console.error("Error fetching branch details:", error);
