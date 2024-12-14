@@ -40,36 +40,18 @@ export const adminSignup = async (req: Request, res: Response) => {
         const salt = await genSalt(10);
         const adminHashedPassword = await hash(adminPassword, salt);
 
-        const newAdmin = await db.$transaction(async (db) => {
-            const newManager = await db.manager.create({
-                data: {
-                    name: managerName,
-                    email: managerEmail,
-                    password: managerHashedPassword
-                }
-            });
-
-            return await db.admin.create({
-                data: {
-                    name: adminName,
-                    email: adminEmail,
-                    password: adminHashedPassword,
-                    branches: {
-                        create: {
-                            name: branchName,
-                            location: branchLocation,
-                            managerId: newManager.id
-                        }
-                    }
-                }
-            });
-        });
-
+        const newAdmin = await db.admin.create({
+            data: {
+                name: adminName,
+                email: adminEmail,
+                password: adminHashedPassword
+            }
+        })
 
         const token = sign({ id: newAdmin.id }, JWT_SECRET);
 
         res.status(201).json({
-            message: "Admin and branch created successfully",
+            message: "Admin created successfully",
             admin: newAdmin,
             token: token
         });
