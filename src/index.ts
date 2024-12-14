@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/admin', adminRouter);
-app.use('/manager', managerRouter);
+// app.use('/manager', managerRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.send("Server up and running");

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../../../lib/db";
 import { newBranchInput } from "../../../helpers/zod";
-import { genSalt, hash } from "bcrypt";
 import { verify } from "jsonwebtoken";
 import { JWT_SECRET } from "../../../helpers/constants";
 
@@ -112,7 +111,7 @@ export const addBranch = async (req: Request, res: Response) => {
             return;
         }
 
-        const { adminId, managerEmail, managerName, managerPassword, branchName, branchLocation } = parsedBody.data;
+        const { adminId, branchName, branchLocation } = parsedBody.data;
 
         const admin = await db.admin.findUnique({ where: { id: adminId } });
         if (!admin) {
@@ -120,35 +119,16 @@ export const addBranch = async (req: Request, res: Response) => {
             return;
         }
 
-        const existingManager = await db.manager.findUnique({ where: { email: managerEmail } });
-        if (existingManager) {
-            res.status(400).json({ error: "Manager with this email already exists" });
-            return;
-        }
-
-        const salt = await genSalt(10);
-        const managerHashedPassword = await hash(managerPassword, salt);
-
-        const newBranch = await db.$transaction(async (db) => {
-            const newManager = await db.manager.create({
-                data: {
-                    name: managerName,
-                    email: managerEmail,
-                    password: managerHashedPassword
-                }
-            });
-            return await db.branch.create({
-                data: {
-                    name: branchName,
-                    location: branchLocation,
-                    adminId: adminId,
-                    managerId: newManager.id
-                }
-            });
-        });
+        const newBranch =  await db.branch.create({
+            data: {
+                name: branchName,
+                location: branchLocation,
+                adminId: adminId
+            }
+        })
 
         res.status(201).json({
-            message: "Branch and manager added successfully",
+            message: "Branch added successfully",
             branch: newBranch
         });
     } catch (error) {
@@ -189,7 +169,6 @@ export const allBranches = async (req: Request, res: Response) => {
             const branches = await db.branch.findMany({
                 where: { adminId: adminId },
                 include: {
-                    manager: true,
                     movies: {
                         include: {
                             seatCategories: {
