@@ -37,7 +37,6 @@ export const getBranches = async (req: Request, res: Response) => {
             const branches = await db.branch.findMany({
                 where: { adminId: adminId },
                 include: {
-                    manager: true,
                     movies: {
                         include: {
                             seatCategories: {

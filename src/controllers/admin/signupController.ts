@@ -21,12 +21,7 @@ export const adminSignup = async (req: Request, res: Response) => {
         const {
             adminEmail,
             adminPassword,
-            managerEmail,
-            managerPassword,
             adminName,
-            managerName,
-            branchName,
-            branchLocation
         } = parsedBody.data;
 
         const existingAdmin = await db.admin.findUnique({
@@ -44,7 +39,6 @@ export const adminSignup = async (req: Request, res: Response) => {
 
         const salt = await genSalt(10);
         const adminHashedPassword = await hash(adminPassword, salt);
-        const managerHashedPassword = await hash(managerPassword, salt);
 
         const newAdmin = await db.$transaction(async (db) => {
             const newManager = await db.manager.create({
@@ -70,6 +64,7 @@ export const adminSignup = async (req: Request, res: Response) => {
                 }
             });
         });
+
 
         const token = sign({ id: newAdmin.id }, JWT_SECRET);
 

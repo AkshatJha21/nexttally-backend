@@ -18,6 +18,7 @@ model Admin {
   name      String
   email     String    @unique
   password  String
+  hasBranch Boolean   @default(false)
   branches  Branch[]
 }
 
@@ -26,18 +27,8 @@ model Branch {
   name      String
   location  String
   adminId   Int
-  managerId Int       @unique
   admin     Admin     @relation(fields: [adminId], references: [id],  onDelete: Cascade)
-  manager   Manager   @relation(fields: [managerId], references: [id], onDelete: Cascade)
   movies    Movie[]
-}
-
-model Manager {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  password  String
-  branch    Branch?
 }
 
 model Movie {

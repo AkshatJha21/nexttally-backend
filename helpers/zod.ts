@@ -5,12 +5,7 @@ import z from "zod";
 export const adminSignupInput = z.object({
     adminName: z.string(),
     adminEmail: z.string().email(),
-    adminPassword: z.string().min(8),
-    branchName: z.string(),
-    branchLocation: z.string(),
-    managerName: z.string(),
-    managerEmail: z.string().email(),
-    managerPassword: z.string().min(8)
+    adminPassword: z.string().min(8)
 });
 
 export const adminLoginInput = z.object({
@@ -23,10 +18,7 @@ export const adminLoginInput = z.object({
 export const newBranchInput = z.object({
     adminId: z.number(),
     branchName: z.string(),
-    branchLocation: z.string(),
-    managerName: z.string(),
-    managerEmail: z.string().email(),
-    managerPassword: z.string().min(8)
+    branchLocation: z.string()
 });
 
 // Manager login :-
